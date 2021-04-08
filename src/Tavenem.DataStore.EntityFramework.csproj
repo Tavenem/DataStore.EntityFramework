@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Tavenem.DataStorage.EntityFramework</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Tavenem.DataStore.EntityFramework</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Wil Stead</Authors>
+    <Description>An implementation of Tavenem.DataStore for Entity Framework Core.</Description>
+    <Copyright>Copyright © 2019-2021 Wil Stead</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Tavenem/DataStore.EntityFramework</PackageProjectUrl>
+    <PackageIcon>tavenem_128.png</PackageIcon>
+    <PackageTags>repository</PackageTags>
+    <RepositoryUrl>https://github.com/Tavenem/DataStore.EntityFramework.git</RepositoryUrl>
+    <RepositoryBranch>main</RepositoryBranch>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="tavenem_128.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="5.0.5" />
+    <PackageReference Include="Tavenem.DataStore" Version="0.29.1-preview" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
