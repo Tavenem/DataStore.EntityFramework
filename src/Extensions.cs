@@ -12,11 +12,15 @@ public static class Extensions
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="collection">The current collection.</param>
-    /// <param name="pageNumber">The current page number.</param>
+    /// <param name="pageNumber">The current page number. The first page is 1.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="totalCount">The total number of results, of which this page is a subset.</param>
     /// <returns>An <see cref="IPagedList{T}"/> containing the items in the current collection.</returns>
-    public static async Task<IPagedList<T>> AsPagedListAsync<T>(this IQueryable<T> collection, long pageNumber, long pageSize, long totalCount)
+    public static async Task<IPagedList<T>> AsPagedListAsync<T>(
+        this IQueryable<T> collection,
+        long pageNumber,
+        long pageSize,
+        long totalCount)
     {
         var list = new List<T>();
         await foreach (var item in collection.AsAsyncEnumerable())

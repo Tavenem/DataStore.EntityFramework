@@ -169,10 +169,10 @@ public class EntityFrameworkDataStoreQueryable<T> : IDataStoreQueryable<T>
 
     /// <summary>
     /// Gets a number of items from this <see cref="IDataStoreQueryable{T}" /> equal to
-    /// <paramref name="pageSize" />, after skipping <paramref name="pageNumber" /> multiples of
+    /// <paramref name="pageSize" />, after skipping <paramref name="pageNumber" />-1 multiples of
     /// that amount.
     /// </summary>
-    /// <param name="pageNumber">The current page number.</param>
+    /// <param name="pageNumber">The current page number. The first page is 1.</param>
     /// <param name="pageSize">The page size.</param>
     /// <returns>An <see cref="IPagedList{T}" /> of items from this <see
     /// cref="IDataStoreQueryable{T}" />.</returns>
@@ -183,10 +183,10 @@ public class EntityFrameworkDataStoreQueryable<T> : IDataStoreQueryable<T>
 
     /// <summary>
     /// Asynchronously gets a number of items from this <see cref="IDataStoreQueryable{T}"/>
-    /// equal to <paramref name="pageSize"/>, after skipping <paramref name="pageNumber"/>
+    /// equal to <paramref name="pageSize"/>, after skipping <paramref name="pageNumber"/>-1
     /// multiples of that amount.
     /// </summary>
-    /// <param name="pageNumber">The current page number.</param>
+    /// <param name="pageNumber">The current page number. The first page is 1.</param>
     /// <param name="pageSize">The page size.</param>
     /// <returns>An <see cref="IPagedList{T}"/> of items from this <see
     /// cref="IDataStoreQueryable{T}"/>.</returns>
