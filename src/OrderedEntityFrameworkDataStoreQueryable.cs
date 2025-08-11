@@ -1,31 +1,21 @@
 ﻿using System.Linq.Expressions;
+using Tavenem.DataStorage.Interfaces;
 
 namespace Tavenem.DataStorage.EntityFramework;
 
 /// <summary>
 /// Provides LINQ operations on an <see cref="EntityFrameworkDataStore"/>, after an ordering operation.
 /// </summary>
-public class OrderedEntityFrameworkDataStoreQueryable<T> : EntityFrameworkDataStoreQueryable<T>, IOrderedDataStoreQueryable<T>
+public class OrderedEntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IOrderedQueryable<TSource> source)
+    : EntityFrameworkDataStoreQueryable<TSource>(provider, source),
+    IOrderedDataStoreQueryable<TSource>
+    where TSource : notnull
 {
-    /// <summary>
-    /// Initializes a new instance of <see cref="OrderedEntityFrameworkDataStoreQueryable{T}"/>.
-    /// </summary>
-    public OrderedEntityFrameworkDataStoreQueryable(IOrderedQueryable<T> source) : base(source) { }
+    /// <inheritdoc />
+    public IOrderedDataStoreQueryable<TSource> ThenBy<TKey>(Expression<Func<TSource, TKey>> keySelector, IComparer<TKey>? comparer = null)
+        => new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.ThenBy(keySelector, comparer));
 
-    /// <summary>
-    /// Performs a subsequent ordering of the elements in this <see
-    /// cref="IOrderedDataStoreQueryable{T}"/> in the given order.
-    /// </summary>
-    /// <typeparam name="TKey">The type of the key returned by the function represented by
-    /// <paramref name="keySelector"/>.</typeparam>
-    /// <param name="keySelector">A function to extract a key from each element.</param>
-    /// <param name="descending">Whether results will be ordered in descending order.</param>
-    /// <returns>
-    /// An <see cref="IOrderedDataStoreQueryable{T}"/> whose elements are sorted according to a
-    /// key.
-    /// </returns>
-    public IOrderedDataStoreQueryable<T> ThenBy<TKey>(Expression<Func<T, TKey>> keySelector, bool descending = false)
-        => descending
-            ? new OrderedEntityFrameworkDataStoreQueryable<T>(((IOrderedQueryable<T>)_source).ThenByDescending(keySelector))
-            : new OrderedEntityFrameworkDataStoreQueryable<T>(((IOrderedQueryable<T>)_source).ThenBy(keySelector));
+    /// <inheritdoc />
+    public IOrderedDataStoreQueryable<TSource> ThenByDescending<TKey>(Expression<Func<TSource, TKey>> keySelector, IComparer<TKey>? comparer = null)
+        => new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.ThenByDescending(keySelector, comparer));
 }

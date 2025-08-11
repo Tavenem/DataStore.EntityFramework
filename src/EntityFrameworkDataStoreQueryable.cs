@@ -1,518 +1,590 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Text.Json.Serialization.Metadata;
+using Tavenem.DataStorage.Interfaces;
 
 namespace Tavenem.DataStorage.EntityFramework;
 
 /// <summary>
-/// Provides LINQ operations on a <see cref="EntityFrameworkDataStore"/>.
+/// Provides LINQ operations on a <see cref="EntityFrameworkDataStore"/>'s data.
 /// </summary>
-public class EntityFrameworkDataStoreQueryable<T> : IDataStoreQueryable<T>
+/// <typeparam name="TSource">
+/// The type of the elements of the source.
+/// </typeparam>
+public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQueryable<TSource> source)
+    : IDataStoreDistinctByQueryable<TSource>,
+    IDataStoreDistinctQueryable<TSource>,
+    IDataStoreFirstQueryable<TSource>,
+    IDataStoreGroupByQueryable<TSource>,
+    IDataStoreGroupJoinQueryable<TSource>,
+    IDataStoreIntersectByQueryable<TSource>,
+    IDataStoreIntersectQueryable<TSource>,
+    IDataStoreJoinQueryable<TSource>,
+    IDataStoreLastQueryable<TSource>,
+    IDataStoreOfTypeQueryable<TSource>,
+    IDataStoreOrderableQueryable<TSource>,
+    IDataStoreReverseQueryable<TSource>,
+    IDataStoreSelectManyQueryable<TSource>,
+    IDataStoreSelectQueryable<TSource>,
+    IDataStoreSkipLastQueryable<TSource>,
+    IDataStoreSkipQueryable<TSource>,
+    IDataStoreSkipWhileQueryable<TSource>,
+    IDataStoreTakeLastQueryable<TSource>,
+    IDataStoreTakeQueryable<TSource>,
+    IDataStoreTakeWhileQueryable<TSource>,
+    IDataStoreUnionByQueryable<TSource>,
+    IDataStoreUnionQueryable<TSource>,
+    IDataStoreWhereQueryable<TSource>,
+    IDataStoreZipQueryable<TSource>
+    where TSource : notnull
 {
-    private protected readonly IQueryable<T> _source;
+    /// <inheritdoc />
+    public IDataStore Provider { get; } = provider;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="EntityFrameworkDataStoreQueryable{T}"/>.
-    /// </summary>
-    public EntityFrameworkDataStoreQueryable(IQueryable<T> source) => _source = source;
-
-    /// <summary>
-    /// Determines whether this <see cref="IDataStoreQueryable{T}"/> contains any elements.
-    /// </summary>
-    /// <returns><see langword="true"/> if the source sequence contains any elements; otherwise,
-    /// <see langword="false"/>.</returns>
-    public bool Any() => _source.Any();
-
-    /// <summary>
-    /// Determines whether any element of this <see cref="IDataStoreQueryable{T}"/> satisfies a
-    /// condition.
+    /// Determines whether all the elements of a sequence satisfy a condition.
     /// </summary>
     /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns><see langword="true"/> if any elements in the source sequence pass the test in
-    /// the specified predicate; otherwise,
-    /// <see langword="false"/>.</returns>
-    public bool Any(Expression<Func<T, bool>> predicate) => _source.Any(predicate);
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if all the elements of a sequence satisfy a condition; otherwise,
+    /// <see langword="false"/>.
+    /// </returns>
+    public async ValueTask<bool> AllAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+        => await source.AllAsync(predicate, cancellationToken);
 
     /// <summary>
-    /// Asynchronously determines whether this <see cref="IDataStoreQueryable{T}"/> contains any
-    /// elements.
+    /// Determines whether a sequence contains any elements.
     /// </summary>
-    /// <returns><see langword="true"/> if the source sequence contains any elements; otherwise,
-    /// <see langword="false"/>.</returns>
-    public Task<bool> AnyAsync() => _source.AnyAsync();
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if the source sequence contains any elements; otherwise, <see
+    /// langword="false"/>.
+    /// </returns>
+    public async ValueTask<bool> AnyAsync(CancellationToken cancellationToken)
+        => await source.AnyAsync(cancellationToken);
 
     /// <summary>
-    /// Asynchronously determines whether any element of this <see
-    /// cref="IDataStoreQueryable{T}"/> satisfies a condition.
-    /// </summary>
-    /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns><see langword="true"/> if any elements in the source sequence pass the test in
-    /// the specified predicate; otherwise,
-    /// <see langword="false"/>.</returns>
-    public Task<bool> AnyAsync(Expression<Func<T, bool>> predicate) => _source.AnyAsync(predicate);
-
-    /// <summary>
-    /// Asynchronously determines whether any element of this <see
-    /// cref="IDataStoreQueryable{T}"/> satisfies a condition.
+    /// Determines whether any element of a sequence satisfies a condition.
     /// </summary>
     /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns><see langword="true"/> if any elements in the source sequence pass the test in
-    /// the specified predicate; otherwise,
-    /// <see langword="false"/>.</returns>
-    public async Task<bool> AnyAsync(Func<T, ValueTask<bool>> predicate)
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// <see langword="true"/>> if the source sequence is not empty and at least one of its elements
+    /// passes the test in the specified predicate; otherwise, <see langword="false"/>.
+    /// </returns>
+    public async ValueTask<bool> AnyAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+        => await source.AnyAsync(predicate, cancellationToken);
+
+    /// <summary>
+    /// Determines whether a sequence contains a specified element.
+    /// </summary>
+    /// <param name="value">The value to locate in the sequence.</param>
+    /// <param name="comparer">Ignored. Not supported by EntityFramework.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if the source sequence contains an element that has the specified
+    /// value; otherwise, <see langword="false"/>.
+    /// </returns>
+#pragma warning disable IDE0060 // Remove unused parameter. Provided to match extension on IAsyncEnumerable<T> so that this implementation takes precedence.
+    public async ValueTask<bool> ContainsAsync(TSource value, IEqualityComparer<TSource>? comparer = null, CancellationToken cancellationToken = default)
+        => await source.ContainsAsync(value, cancellationToken);
+#pragma warning restore IDE0060 // Remove unused parameter
+
+    /// <summary>
+    /// Returns the number of elements in this source.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The number of elements in the this source.</returns>
+    /// <exception cref="OverflowException">
+    /// The number of elements in this source is larger than <see cref="int.MaxValue"/>.
+    /// </exception>
+    public async ValueTask<int> CountAsync(CancellationToken cancellationToken)
+        => await source.CountAsync(cancellationToken);
+
+    /// <summary>
+    /// Returns the number of elements in this source that satisfy a condition.
+    /// </summary>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The number of elements in the this source.</returns>
+    /// <exception cref="OverflowException">
+    /// The number of elements in this source that satisfy the condition is larger than <see
+    /// cref="int.MaxValue"/>.
+    /// </exception>
+    public async ValueTask<int> CountAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+        => await source.CountAsync(predicate, cancellationToken);
+
+    /// <inheritdoc />
+    public IDataStoreDistinctByQueryable<TSource> DistinctBy<TKey>(Expression<Func<TSource, TKey>> keySelector, IEqualityComparer<TKey>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.DistinctBy(keySelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreDistinctQueryable<TSource> Distinct(IEqualityComparer<TSource>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Distinct(comparer));
+
+    /// <summary>
+    /// Returns the element at a specified index in a sequence.
+    /// </summary>
+    /// <param name="index">The index of the element to retrieve.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken" />.</param>
+    /// <returns>
+    /// The element at the specified position in this sequence.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="index" /> is outside the bounds of this sequence.
+    /// </exception>
+    public async ValueTask<TSource> ElementAtAsync(int index, CancellationToken cancellationToken = default)
+        => await source.ElementAtAsync(index, cancellationToken);
+
+    /// <summary>
+    /// Returns the element at a specified index in a sequence.
+    /// </summary>
+    /// <param name="index">
+    /// The index of the element to retrieve, which is either from the start or the end.
+    /// </param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken" />.</param>
+    /// <returns>
+    /// The element at the specified position in this sequence.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="index" /> is outside the bounds of this sequence.
+    /// </exception>
+    public async ValueTask<TSource> ElementAtAsync(Index index, CancellationToken cancellationToken = default)
+        => await source.ElementAtAsync(
+            index.IsFromEnd
+                ? index.GetOffset(await source.CountAsync(cancellationToken))
+                : index.Value,
+            cancellationToken);
+
+    /// <summary>
+    /// Returns the element at a specified index in a sequence, or a default value if the index is
+    /// out of range.
+    /// </summary>
+    /// <param name="index">The index of the element to retrieve.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// The default value of <typeparamref name="TSource"/> if <paramref name="index"/> is outside
+    /// the bounds of the source sequence; otherwise, the element at the specified position in the
+    /// source sequence.
+    /// </returns>
+    public async ValueTask<TSource?> ElementAtOrDefaultAsync(int index, CancellationToken cancellationToken = default)
     {
-        foreach (var item in _source)
+        if (index < 0)
         {
-            if (await predicate.Invoke(item).ConfigureAwait(false))
-            {
-                return true;
-            }
+            return default;
         }
-        return false;
+        try
+        {
+            return await source.ElementAtOrDefaultAsync(index, cancellationToken);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return default;
+        }
     }
 
     /// <summary>
-    /// Enumerates the results of this <see cref="IDataStoreQueryable{T}" /> as an asynchronous
-    /// operation.
+    /// Returns the element at a specified index in a sequence, or a default value if the index is
+    /// out of range.
     /// </summary>
-    /// <returns>An <see cref="IAsyncEnumerable{T}" />.</returns>
-    public IAsyncEnumerable<T> AsAsyncEnumerable() => _source.AsAsyncEnumerable();
+    /// <param name="index">
+    /// The index of the element to retrieve, which is either from the start or the end.
+    /// </param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// The default value of <typeparamref name="TSource"/> if <paramref name="index"/> is outside
+    /// the bounds of the source sequence; otherwise, the element at the specified position in the
+    /// source sequence.
+    /// </returns>
+    public async ValueTask<TSource?> ElementAtOrDefaultAsync(Index index, CancellationToken cancellationToken = default)
+    {
+        var indexValue = index.IsFromEnd
+            ? index.GetOffset(await source.CountAsync(cancellationToken))
+            : index.Value;
+        if (indexValue < 0)
+        {
+            return default;
+        }
+        try
+        {
+            return await source.ElementAtOrDefaultAsync(indexValue, cancellationToken);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return default;
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<TSource> FirstAsync(CancellationToken cancellationToken = default)
+        => await source.FirstAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource> FirstAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        => await source.FirstAsync(predicate, cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource?> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+        => await source.FirstOrDefaultAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource?> FirstOrDefaultAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        => await source.FirstOrDefaultAsync(predicate, cancellationToken);
+
+    /// <inheritdoc />
+    IAsyncEnumerator<TSource> IAsyncEnumerable<TSource>.GetAsyncEnumerator(CancellationToken cancellationToken)
+        => source.AsAsyncEnumerable().GetAsyncEnumerator(cancellationToken);
 
     /// <summary>
-    /// Enumerates the results of this <see cref="IDataStoreQueryable{T}" />.
+    /// Returns an <see cref="IEnumerator{T}"/> for this source. The enumerator provides a simple
+    /// way to access all the contents of the collection.
     /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>An <see cref="IEnumerable{T}" />.</returns>
-    public IEnumerable<T> AsEnumerable() => _source;
-
-    /// <summary>
-    /// Returns the number of elements in this <see cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <returns>The number of elements in this <see cref="IDataStoreQueryable{T}"/>.</returns>
-    /// <exception cref="OverflowException">
-    /// The number of elements in source is larger than <see cref="int.MaxValue"/>.
+    /// <exception cref="OperationCanceledException">
+    /// If the <see cref="CancellationToken"/> is cancelled.
     /// </exception>
-    public int Count() => _source.Count();
+    public ValueTask<IEnumerator<TSource>> GetEnumeratorAsync(CancellationToken cancellationToken = default)
+        => new(source.GetEnumerator());
 
-    /// <summary>
-    /// Asynchronously returns the number of elements in this <see cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <returns>The number of elements in this <see cref="IDataStoreQueryable{T}"/>.</returns>
-    /// <exception cref="OverflowException">
-    /// The number of elements in source is larger than <see cref="int.MaxValue"/>.
-    /// </exception>
-    public Task<int> CountAsync() => _source.CountAsync();
-
-    /// <summary>
-    /// Returns the first element of this <see cref="IDataStoreQueryable{T}" />, or a default
-    /// value if the sequence contains no elements.
-    /// </summary>
-    /// <returns>
-    /// The first element in this <see cref="IDataStoreQueryable{T}" />, or a default value if
-    /// the sequence contains no elements.
-    /// </returns>
-    public T? FirstOrDefault() => _source.FirstOrDefault();
-
-    /// <summary>
-    /// Returns the first element of this <see cref="IDataStoreQueryable{T}"/> that satisfies a
-    /// specified condition or a default value if no such element is found.
-    /// </summary>
-    /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns>
-    /// default(TSource) if this <see cref="IDataStoreQueryable{T}"/> is empty or if no element
-    /// passes the test specified by <paramref name="predicate"/>; otherwise, the first element
-    /// in source that passes the test specified by <paramref name="predicate"/>.
-    /// </returns>
-    public T? FirstOrDefault(Expression<Func<T, bool>> predicate) => _source.FirstOrDefault(predicate);
-
-    /// <summary>
-    /// Returns the first element of this <see cref="IDataStoreQueryable{T}" />, or a default
-    /// value if the sequence contains no elements, asynchronously.
-    /// </summary>
-    /// <returns>
-    /// The first element in this <see cref="IDataStoreQueryable{T}" />, or a default value if
-    /// the sequence contains no elements.
-    /// </returns>
-    public async Task<T?> FirstOrDefaultAsync() => await _source.FirstOrDefaultAsync().ConfigureAwait(false);
-
-    /// <summary>
-    /// Asynchronously returns the first element of this <see cref="IDataStoreQueryable{T}"/>
-    /// that satisfies a specified condition or a default value if no such element is found.
-    /// </summary>
-    /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns>
-    /// default(TSource) if this <see cref="IDataStoreQueryable{T}"/> is empty or if no element
-    /// passes the test specified by <paramref name="predicate"/>; otherwise, the first element
-    /// in source that passes the test specified by <paramref name="predicate"/>.
-    /// </returns>
-    public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate) => await _source.FirstOrDefaultAsync(predicate).ConfigureAwait(false);
-
-    /// <summary>
-    /// Asynchronously returns the first element of this <see cref="IDataStoreQueryable{T}"/>
-    /// that satisfies a specified condition or a default value if no such element is found.
-    /// </summary>
-    /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns>
-    /// default(TSource) if this <see cref="IDataStoreQueryable{T}"/> is empty or if no element
-    /// passes the test specified by <paramref name="predicate"/>; otherwise, the first element
-    /// in source that passes the test specified by <paramref name="predicate"/>.
-    /// </returns>
-    public async Task<T?> FirstOrDefaultAsync(Func<T, ValueTask<bool>> predicate)
-    {
-        await foreach (var item in _source.AsAsyncEnumerable())
-        {
-            if (await predicate.Invoke(item).ConfigureAwait(false))
-            {
-                return item;
-            }
-        }
-        return default!;
-    }
-
-    /// <summary>
-    /// Gets a number of items from this <see cref="IDataStoreQueryable{T}" /> equal to
-    /// <paramref name="pageSize" />, after skipping <paramref name="pageNumber" />-1 multiples of
-    /// that amount.
-    /// </summary>
-    /// <param name="pageNumber">The current page number. The first page is 1.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <returns>An <see cref="IPagedList{T}" /> of items from this <see
-    /// cref="IDataStoreQueryable{T}" />.</returns>
-    public IPagedList<T> GetPage(int pageNumber, int pageSize) => _source
+    /// <inheritdoc />
+    public async ValueTask<IPagedList<TSource>> GetPageAsync(
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default) => (await source
         .Skip((pageNumber - 1) * pageSize)
         .Take(pageSize)
-        .AsPagedList(pageNumber, pageSize, _source.LongCount());
+        .ToListAsync(cancellationToken))
+        .AsPagedList(pageNumber, pageSize, await source.LongCountAsync(cancellationToken));
+
+    /// <inheritdoc />
+    public IDataStoreGroupByQueryable<TResult> GroupBy<TKey, TResult>(
+        Expression<Func<TSource, TKey>> keySelector,
+        Expression<Func<TKey, IEnumerable<TSource>, TResult>> resultSelector,
+        IEqualityComparer<TKey>? comparer = null) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.GroupBy(keySelector, resultSelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreGroupByQueryable<TResult> GroupBy<TKey, TElement, TResult>(
+        Expression<Func<TSource, TKey>> keySelector,
+        Expression<Func<TSource, TElement>> elementSelector,
+        Expression<Func<TKey, IEnumerable<TElement>, TResult>> resultSelector,
+        IEqualityComparer<TKey>? comparer = null) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.GroupBy(keySelector, elementSelector, resultSelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreGroupByQueryable<IGrouping<TKey, TSource>> GroupBy<TKey>(
+        Expression<Func<TSource, TKey>> keySelector,
+        IEqualityComparer<TKey>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<IGrouping<TKey, TSource>>(Provider, source.GroupBy(keySelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreGroupByQueryable<IGrouping<TKey, TElement>> GroupBy<TKey, TElement>(
+        Expression<Func<TSource, TKey>> keySelector,
+        Expression<Func<TSource, TElement>> elementSelector,
+        IEqualityComparer<TKey>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<IGrouping<TKey, TElement>>(Provider, source.GroupBy(keySelector, elementSelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreGroupJoinQueryable<TResult> GroupJoin<TInner, TKey, TResult>(
+        IEnumerable<TInner> inner,
+        Expression<Func<TSource, TKey>> outerKeySelector,
+        Expression<Func<TInner, TKey>> innerKeySelector,
+        Expression<Func<TSource, IEnumerable<TInner>, TResult>> resultSelector,
+        IEqualityComparer<TKey>? comparer = null) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreIntersectQueryable<TSource> Intersect(IEnumerable<TSource> source2, IEqualityComparer<TSource>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Intersect(source2, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreIntersectByQueryable<TSource> IntersectBy<TKey>(
+        IEnumerable<TKey> source2,
+        Expression<Func<TSource, TKey>> keySelector,
+        IEqualityComparer<TKey>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.IntersectBy(source2, keySelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreJoinQueryable<TResult> Join<TInner, TKey, TResult>(
+        IEnumerable<TInner> inner,
+        Expression<Func<TSource, TKey>> outerKeySelector,
+        Expression<Func<TInner, TKey>> innerKeySelector,
+        Expression<Func<TSource, TInner, TResult>> resultSelector,
+        IEqualityComparer<TKey>? comparer = null) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreJoinQueryable<TResult> LeftJoin<TInner, TKey, TResult>(
+        IEnumerable<TInner> inner,
+        Expression<Func<TSource, TKey>> outerKeySelector,
+        Expression<Func<TInner, TKey>> innerKeySelector,
+        Expression<Func<TSource, TInner?, TResult>> resultSelector,
+        IEqualityComparer<TKey>? comparer = null) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreJoinQueryable<TResult> RightJoin<TInner, TKey, TResult>(
+        IEnumerable<TInner> inner,
+        Expression<Func<TSource, TKey>> outerKeySelector,
+        Expression<Func<TInner, TKey>> innerKeySelector,
+        Expression<Func<TSource?, TInner, TResult>> resultSelector,
+        IEqualityComparer<TKey>? comparer = null) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer));
+
+    /// <inheritdoc />
+    public async ValueTask<TSource> LastAsync(CancellationToken cancellationToken = default)
+        => await source.LastAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource> LastAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        => await source.LastAsync(predicate, cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource?> LastOrDefaultAsync(CancellationToken cancellationToken = default)
+        => await source.LastOrDefaultAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource?> LastOrDefaultAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        => await source.LastOrDefaultAsync(predicate, cancellationToken);
 
     /// <summary>
-    /// Asynchronously gets a number of items from this <see cref="IDataStoreQueryable{T}"/>
-    /// equal to <paramref name="pageSize"/>, after skipping <paramref name="pageNumber"/>-1
-    /// multiples of that amount.
+    /// Returns the number of elements in this source.
     /// </summary>
-    /// <param name="pageNumber">The current page number. The first page is 1.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <returns>An <see cref="IPagedList{T}"/> of items from this <see
-    /// cref="IDataStoreQueryable{T}"/>.</returns>
-    public Task<IPagedList<T>> GetPageAsync(int pageNumber, int pageSize) => _source
-        .Skip((pageNumber - 1) * pageSize)
-        .Take(pageSize)
-        .AsPagedListAsync(pageNumber, pageSize, _source.LongCount());
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The number of elements in the this source.</returns>
+    /// <exception cref="OverflowException">
+    /// The number of elements in this source is larger than <see cref="long.MaxValue"/>.
+    /// </exception>
+    public async ValueTask<long> LongCountAsync(CancellationToken cancellationToken)
+        => await source.LongCountAsync(cancellationToken);
 
     /// <summary>
-    /// Returns the maximum value of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <returns>The maximum value of this <see cref="IDataStoreQueryable{T}"/>.</returns>
-    public T? Max() => _source.Max();
-
-    /// <summary>
-    /// Asynchronously returns the maximum value of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <returns>
-    /// The maximum value of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </returns>
-    public async Task<T?> MaxAsync() => await _source.MaxAsync().ConfigureAwait(false);
-
-    /// <summary>
-    /// Returns the minimum value of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <returns>The minimum value of this <see cref="IDataStoreQueryable{T}"/>.</returns>
-    public T? Min() => _source.Min();
-
-    /// <summary>
-    /// Asynchronously returns the minimum value of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <returns>
-    /// The minimum value of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </returns>
-    public async Task<T?> MinAsync() => await _source.MinAsync().ConfigureAwait(false);
-
-    /// <summary>
-    /// Filters the elements of this <see cref="IDataStoreQueryable{T}"/> based on a specified
-    /// type.
-    /// </summary>
-    /// <typeparam name="TResult">The type to filter the elements of the sequence
-    /// on.</typeparam>
-    /// <returns>
-    /// A collection that contains the elements from source that have type <typeparamref
-    /// name="TResult"/>.
-    /// </returns>
-    public IDataStoreQueryable<TResult> OfType<TResult>()
-        => new EntityFrameworkDataStoreQueryable<TResult>(_source.OfType<TResult>());
-
-    /// <summary>
-    /// Sorts the elements of this <see cref="IDataStoreQueryable{T}" /> in ascending order
-    /// according to a key.
-    /// </summary>
-    /// <param name="keySelector">A function to extract a key from an element.</param>
-    /// <param name="descending">Whether results will be ordered in descending order.</param>
-    /// <returns>An <see cref="IDataStoreQueryable{T}" />.</returns>
-    public IOrderedDataStoreQueryable<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector, bool descending = false)
-        => new OrderedEntityFrameworkDataStoreQueryable<T>(descending
-            ? _source.OrderByDescending(keySelector)
-            : _source.OrderBy(keySelector));
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> into a new form.
-    /// </summary>
-    /// <typeparam name="TResult">The type of the value returned by the function represented by
-    /// selector.</typeparam>
-    /// <param name="selector">A projection function to apply to each element.</param>
-    /// <returns>
-    /// An <see cref="IDataStoreQueryable{T}"/> whose elements are the result of invoking a
-    /// projection function on each element of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </returns>
-    public IDataStoreQueryable<TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
-        => new EntityFrameworkDataStoreQueryable<TResult>(_source.Select(selector));
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> into a new form.
-    /// </summary>
-    /// <typeparam name="TResult">The type of the value returned by the function represented by
-    /// selector.</typeparam>
-    /// <param name="selector">A projection function to apply to each element.</param>
-    /// <returns>
-    /// An <see cref="IAsyncEnumerable{T}"/> whose elements are the result of invoking a
-    /// projection function on each element of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </returns>
-    public async IAsyncEnumerable<TResult> SelectAsync<TResult>(Func<T, ValueTask<TResult>> selector)
-    {
-        foreach (var item in _source)
-        {
-            yield return await selector.Invoke(item).ConfigureAwait(false);
-        }
-    }
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> to an <see
-    /// cref="IEnumerable{T}"/> and combines the resulting sequences into one sequence.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The type of the elements of the sequence returned by the function represented by
-    /// <paramref name="selector"/>.
-    /// </typeparam>
-    /// <param name="selector">A projection function to apply to each element.</param>
-    /// <returns>
-    /// An <see cref="IDataStoreQueryable{T}"/> whose elements are the result of invoking a
-    /// one-to-many projection function on each element of the input sequence.
-    /// </returns>
-    public IDataStoreQueryable<TResult> SelectMany<TResult>(Expression<Func<T, IEnumerable<TResult>>> selector)
-        => new EntityFrameworkDataStoreQueryable<TResult>(_source.SelectMany(selector));
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> to an <see
-    /// cref="IEnumerable{T}"/> and invokes a result selector function on each element therein.
-    /// The resulting values from each intermediate sequence are combined into a single,
-    /// one-dimensional sequence and returned.
-    /// </summary>
-    /// <typeparam name="TCollection">
-    /// The type of the intermediate elements collected by the function represented by
-    /// <paramref name="collectionSelector"/>.
-    /// </typeparam>
-    /// <typeparam name="TResult">The type of the elements of the resulting
-    /// sequence.</typeparam>
-    /// <param name="collectionSelector">A projection function to apply to each element of the
-    /// input sequence.</param>
-    /// <param name="resultSelector">A projection function to apply to each element of each
-    /// intermediate sequence.</param>
-    /// <returns>
-    /// An <see cref="IDataStoreQueryable{T}"/> whose elements are the result of invoking the
-    /// one-to-many projection function <paramref name="collectionSelector"/> on each element of
-    /// source and then mapping each of those sequence elements and their corresponding source
-    /// element to a result element.
-    /// </returns>
-    public IDataStoreQueryable<TResult> SelectMany<TCollection, TResult>(
-        Expression<Func<T, IEnumerable<TCollection>>> collectionSelector,
-        Expression<Func<T, TCollection, TResult>> resultSelector)
-        => new EntityFrameworkDataStoreQueryable<TResult>(_source.SelectMany(collectionSelector, resultSelector));
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> to an <see
-    /// cref="IEnumerable{T}"/> and combines the resulting sequences into one sequence.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The type of the elements of the sequence returned by the function represented by
-    /// <paramref name="selector"/>.
-    /// </typeparam>
-    /// <param name="selector">A projection function to apply to each element.</param>
-    /// <returns>
-    /// An <see cref="IDataStoreQueryable{T}"/> whose elements are the result of invoking a
-    /// one-to-many projection function on each element of the input sequence.
-    /// </returns>
-    public async IAsyncEnumerable<TResult> SelectManyAsync<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
-    {
-        foreach (var item in _source)
-        {
-            await foreach (var subItem in selector.Invoke(item))
-            {
-                yield return subItem;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> to an <see
-    /// cref="IEnumerable{T}"/> and invokes a result selector function on each element therein.
-    /// The resulting values from each intermediate sequence are combined into a single,
-    /// one-dimensional sequence and returned.
-    /// </summary>
-    /// <typeparam name="TCollection">
-    /// The type of the intermediate elements collected by the function represented by
-    /// <paramref name="collectionSelector"/>.
-    /// </typeparam>
-    /// <typeparam name="TResult">The type of the elements of the resulting
-    /// sequence.</typeparam>
-    /// <param name="collectionSelector">A projection function to apply to each element of the
-    /// input sequence.</param>
-    /// <param name="resultSelector">A projection function to apply to each element of each
-    /// intermediate sequence.</param>
-    /// <returns>
-    /// An <see cref="IAsyncEnumerable{T}"/> whose elements are the result of invoking the
-    /// one-to-many projection function <paramref name="collectionSelector"/> on each element of
-    /// source and then mapping each of those sequence elements and their corresponding source
-    /// element to a result element.
-    /// </returns>
-    public async IAsyncEnumerable<TResult> SelectManyAsync<TCollection, TResult>(
-        Func<T, IEnumerable<TCollection>> collectionSelector,
-        Func<T, TCollection, ValueTask<TResult>> resultSelector)
-    {
-        foreach (var item in _source)
-        {
-            foreach (var subItem in collectionSelector.Invoke(item))
-            {
-                yield return await resultSelector.Invoke(item, subItem).ConfigureAwait(false);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> to an <see
-    /// cref="IEnumerable{T}"/> and invokes a result selector function on each element therein.
-    /// The resulting values from each intermediate sequence are combined into a single,
-    /// one-dimensional sequence and returned.
-    /// </summary>
-    /// <typeparam name="TCollection">
-    /// The type of the intermediate elements collected by the function represented by
-    /// <paramref name="collectionSelector"/>.
-    /// </typeparam>
-    /// <typeparam name="TResult">The type of the elements of the resulting
-    /// sequence.</typeparam>
-    /// <param name="collectionSelector">A projection function to apply to each element of the
-    /// input sequence.</param>
-    /// <param name="resultSelector">A projection function to apply to each element of each
-    /// intermediate sequence.</param>
-    /// <returns>
-    /// An <see cref="IAsyncEnumerable{T}"/> whose elements are the result of invoking the
-    /// one-to-many projection function <paramref name="collectionSelector"/> on each element of
-    /// source and then mapping each of those sequence elements and their corresponding source
-    /// element to a result element.
-    /// </returns>
-    public async IAsyncEnumerable<TResult> SelectManyAsync<TCollection, TResult>(
-        Func<T, IAsyncEnumerable<TCollection>> collectionSelector,
-        Func<T, TCollection, TResult> resultSelector)
-    {
-        foreach (var item in _source)
-        {
-            await foreach (var subItem in collectionSelector.Invoke(item))
-            {
-                yield return resultSelector.Invoke(item, subItem);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Projects each element of this <see cref="IDataStoreQueryable{T}"/> to an <see
-    /// cref="IEnumerable{T}"/> and invokes a result selector function on each element therein.
-    /// The resulting values from each intermediate sequence are combined into a single,
-    /// one-dimensional sequence and returned.
-    /// </summary>
-    /// <typeparam name="TCollection">
-    /// The type of the intermediate elements collected by the function represented by
-    /// <paramref name="collectionSelector"/>.
-    /// </typeparam>
-    /// <typeparam name="TResult">The type of the elements of the resulting
-    /// sequence.</typeparam>
-    /// <param name="collectionSelector">A projection function to apply to each element of the
-    /// input sequence.</param>
-    /// <param name="resultSelector">A projection function to apply to each element of each
-    /// intermediate sequence.</param>
-    /// <returns>
-    /// An <see cref="IAsyncEnumerable{T}"/> whose elements are the result of invoking the
-    /// one-to-many projection function <paramref name="collectionSelector"/> on each element of
-    /// source and then mapping each of those sequence elements and their corresponding source
-    /// element to a result element.
-    /// </returns>
-    public async IAsyncEnumerable<TResult> SelectManyAsync<TCollection, TResult>(
-        Func<T, IAsyncEnumerable<TCollection>> collectionSelector,
-        Func<T, TCollection, ValueTask<TResult>> resultSelector)
-    {
-        foreach (var item in _source)
-        {
-            await foreach (var subItem in collectionSelector.Invoke(item))
-            {
-                yield return await resultSelector.Invoke(item, subItem).ConfigureAwait(false);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Bypasses a specified number of elements in a sequence and then returns the remaining
-    /// elements.
-    /// </summary>
-    /// <param name="count">The number of elements to skip before returning the remaining
-    /// elements.</param>
-    /// <returns>
-    /// An <see cref="IDataStoreQueryable{T}"/> that contains elements that occur after the
-    /// specified index in the input sequence.
-    /// </returns>
-    public IDataStoreQueryable<T> Skip(int count)
-        => new EntityFrameworkDataStoreQueryable<T>(_source.Skip(count));
-
-    /// <summary>
-    /// Returns a specified number of contiguous elements from the start of this <see
-    /// cref="IDataStoreQueryable{T}"/>.
-    /// </summary>
-    /// <param name="count">The number of elements to return.</param>
-    /// <returns>
-    /// An <see cref="IDataStoreQueryable{T}"/> that contains the specified number of elements
-    /// from the start of this <see cref="IDataStoreQueryable{T}"/>.
-    /// </returns>
-    public IDataStoreQueryable<T> Take(int count)
-        => new EntityFrameworkDataStoreQueryable<T>(_source.Take(count));
-
-    /// <summary>
-    /// Enumerates the results of this <see cref="IDataStoreQueryable{T}" /> and returns them as
-    /// a <see cref="IReadOnlyList{T}" />.
-    /// </summary>
-    /// <returns>A <see cref="IReadOnlyList{T}" />.</returns>
-    public IReadOnlyList<T> ToList() => _source.ToList();
-
-    /// <summary>
-    /// Asynchronously enumerates the results of this <see cref="IDataStoreQueryable{T}"/> and
-    /// returns them as a <see cref="IReadOnlyList{T}"/>.
-    /// </summary>
-    /// <returns>A <see cref="IReadOnlyList{T}"/>.</returns>
-    public async Task<IReadOnlyList<T>> ToListAsync() => await _source.ToListAsync().ConfigureAwait(false);
-
-    /// <summary>
-    /// Filters this <see cref="IDataStoreQueryable{T}" /> based on a <paramref
-    /// name="predicate"/>.
+    /// Returns the number of elements in this source that satisfy a condition.
     /// </summary>
     /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns>An <see cref="IDataStoreQueryable{T}" />.</returns>
-    public IDataStoreQueryable<T> Where(Expression<Func<T, bool>> predicate)
-        => new EntityFrameworkDataStoreQueryable<T>(_source.Where(predicate));
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The number of elements in the this source.</returns>
+    /// <exception cref="OverflowException">
+    /// The number of elements in this source that satisfy the condition is larger than <see
+    /// cref="long.MaxValue"/>.
+    /// </exception>
+    public async ValueTask<long> LongCountAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+        => await source.LongCountAsync(predicate, cancellationToken);
 
     /// <summary>
-    /// Filters this <see cref="IDataStoreQueryable{T}" /> based on an asynchronous <paramref
-    /// name="predicate" />.
+    /// Returns the maximum value in a generic sequence.
     /// </summary>
-    /// <param name="predicate">A function to test each element for a condition.</param>
-    /// <returns>An <see cref="IAsyncEnumerable{T}" />.</returns>
-    public async IAsyncEnumerable<T> WhereAsync(Func<T, ValueTask<bool>> predicate)
+    /// <param name="comparer">Ignored. Not supported by EntityFramework.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The maximum value in the sequence.</returns>
+#pragma warning disable IDE0060 // Remove unused parameter. Provided to match extension on IAsyncEnumerable<T> so that this implementation takes precedence.
+    public async ValueTask<TSource?> MaxAsync(IComparer<TSource>? comparer = null, CancellationToken cancellationToken = default)
+#pragma warning restore IDE0060 // Remove unused parameter
+        => await source.MaxAsync(cancellationToken);
+
+    /// <summary>
+    /// Returns the minimum value in a generic sequence.
+    /// </summary>
+    /// <param name="comparer">Ignored. Not supported by EntityFramework.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The minimum value in the sequence.</returns>
+#pragma warning disable IDE0060 // Remove unused parameter. Provided to match extension on IAsyncEnumerable<T> so that this implementation takes precedence.
+    public async ValueTask<TSource?> MinAsync(IComparer<TSource>? comparer = null, CancellationToken cancellationToken = default)
+#pragma warning restore IDE0060 // Remove unused parameter
+        => await source.MinAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public IDataStoreOfTypeQueryable<TResult> OfType<TResult>(JsonTypeInfo<TResult>? typeInfo = null) where TResult : TSource
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.OfType<TResult>());
+
+    /// <inheritdoc />
+    public IOrderedDataStoreQueryable<TSource> Order(IComparer<TSource>? comparer = null)
+        => comparer is null
+        ? new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.Order())
+        : new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.Order(comparer));
+
+    /// <inheritdoc />
+    public IOrderedDataStoreQueryable<TSource> OrderBy<TKey>(Expression<Func<TSource, TKey>> keySelector, IComparer<TKey>? comparer = null)
+        => new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.OrderBy(keySelector, comparer));
+
+    /// <inheritdoc />
+    public IOrderedDataStoreQueryable<TSource> OrderByDescending<TKey>(Expression<Func<TSource, TKey>> keySelector, IComparer<TKey>? comparer = null)
+        => new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.OrderByDescending(keySelector, comparer));
+
+    /// <inheritdoc />
+    public IOrderedDataStoreQueryable<TSource> OrderDescending(IComparer<TSource>? comparer = null)
+        => comparer is null
+        ? new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.OrderDescending())
+        : new OrderedEntityFrameworkDataStoreQueryable<TSource>(Provider, source.OrderDescending(comparer));
+
+    /// <inheritdoc />
+    public IDataStoreReverseQueryable<TSource> Reverse()
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Reverse());
+
+    /// <inheritdoc />
+    public async ValueTask<TSource> SingleAsync(CancellationToken cancellationToken = default)
+        => await source.SingleAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource> SingleAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        => await source.SingleAsync(predicate, cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource?> SingleOrDefaultAsync(CancellationToken cancellationToken = default)
+        => await source.SingleOrDefaultAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TSource?> SingleOrDefaultAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+        => await source.SingleOrDefaultAsync(predicate, cancellationToken);
+
+    /// <inheritdoc />
+    public IDataStoreSelectQueryable<TResult> Select<TResult>(Expression<Func<TSource, TResult>> selector) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.Select(selector));
+
+    /// <inheritdoc />
+    public IDataStoreSelectQueryable<TResult> Select<TResult>(Expression<Func<TSource, int, TResult>> selector) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.Select(selector));
+
+    /// <inheritdoc />
+    public IDataStoreSelectManyQueryable<TResult> SelectMany<TCollection, TResult>(
+        Expression<Func<TSource, IEnumerable<TCollection>>> collectionSelector,
+        Expression<Func<TSource, TCollection, TResult>> resultSelector) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.SelectMany(collectionSelector, resultSelector));
+
+    /// <inheritdoc />
+    public IDataStoreSelectManyQueryable<TResult> SelectMany<TCollection, TResult>(
+        Expression<Func<TSource, int, IEnumerable<TCollection>>> collectionSelector,
+        Expression<Func<TSource, TCollection, TResult>> resultSelector) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.SelectMany(collectionSelector, resultSelector));
+
+    /// <inheritdoc />
+    public IDataStoreSkipQueryable<TSource> Skip(int count)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Skip(count));
+
+    /// <inheritdoc />
+    public IDataStoreSkipLastQueryable<TSource> SkipLast(int count)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.SkipLast(count));
+
+    /// <inheritdoc />
+    public IDataStoreSkipWhileQueryable<TSource> SkipWhile(Expression<Func<TSource, bool>> predicate)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.SkipWhile(predicate));
+
+    /// <inheritdoc />
+    public IDataStoreSkipWhileQueryable<TSource> SkipWhile(Expression<Func<TSource, int, bool>> predicate)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.SkipWhile(predicate));
+
+    /// <inheritdoc />
+    public IDataStoreTakeQueryable<TSource> Take(int count)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Take(count));
+
+    /// <inheritdoc />
+    public IDataStoreTakeQueryable<TSource> Take(Range range)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Take(range));
+
+    /// <inheritdoc />
+    public IDataStoreTakeLastQueryable<TSource> TakeLast(int count)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.TakeLast(count));
+
+    /// <inheritdoc />
+    public IDataStoreTakeWhileQueryable<TSource> TakeWhile(Expression<Func<TSource, bool>> predicate)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.TakeWhile(predicate));
+
+    /// <inheritdoc />
+    public IDataStoreTakeWhileQueryable<TSource> TakeWhile(Expression<Func<TSource, int, bool>> predicate)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.TakeWhile(predicate));
+
+    /// <summary>
+    /// Creates an array from this source.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>An array that contains the elements from the this source.</returns>
+    public async ValueTask<TSource[]> ToArrayAsync(CancellationToken cancellationToken = default)
+        => await source.ToArrayAsync(cancellationToken);
+
+    /// <summary>
+    /// Creates a <see cref="Dictionary{TKey, TValue}"/> from this source
+    /// according to a specified key selector function.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the keys returned by <paramref name="keySelector"/>.</typeparam>
+    /// <param name="keySelector">A function to extract a key from each element.</param>
+    /// <param name="comparer">An <see cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> that contains keys and values.</returns>
+    /// <exception cref="ArgumentException">this source contains one or more duplicate keys (via the returned task).</exception>
+    public async ValueTask<Dictionary<TKey, TSource>> ToDictionaryAsync<TKey>(
+        Func<TSource, TKey> keySelector,
+        IEqualityComparer<TKey>? comparer = null,
+        CancellationToken cancellationToken = default)
+        where TKey : notnull
+        => comparer is null
+        ? await source.ToDictionaryAsync(keySelector, cancellationToken)
+        : await source.ToDictionaryAsync(keySelector, comparer, cancellationToken);
+
+    /// <summary>
+    /// Creates a <see cref="HashSet{T}"/> from this source.
+    /// </summary>
+    /// <param name="comparer">An <see cref="IEqualityComparer{T}"/> to compare keys.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// A <see cref="HashSet{T}"/> that contains values selected from this source.
+    /// </returns>
+    public async ValueTask<HashSet<TSource>> ToHashSetAsync(IEqualityComparer<TSource>? comparer = null, CancellationToken cancellationToken = default)
+        => await source.ToHashSetAsync(comparer, cancellationToken);
+
+    /// <summary>
+    /// Creates a list from this source.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>A list that contains the elements from this source.</returns>
+    public async ValueTask<List<TSource>> ToListAsync(CancellationToken cancellationToken = default)
+        => await source.ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<(bool Success, int Count)> TryGetNonEnumeratedCountAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var item in _source)
-        {
-            if (await predicate.Invoke(item).ConfigureAwait(false))
-            {
-                yield return item;
-            }
-        }
+        var result = await source.CountAsync(cancellationToken);
+        return (true, result);
     }
+
+    /// <inheritdoc />
+    public async ValueTask<(bool Success, long Count)> TryGetNonEnumeratedLongCountAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await source.LongCountAsync(cancellationToken);
+        return (true, result);
+    }
+
+    /// <inheritdoc />
+    public IDataStoreUnionQueryable<TSource> Union(IEnumerable<TSource> source2, IEqualityComparer<TSource>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Union(source2, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreUnionByQueryable<TSource> UnionBy<TKey>(
+        IEnumerable<TSource> source2,
+        Expression<Func<TSource, TKey>> keySelector,
+        IEqualityComparer<TKey>? comparer = null)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.UnionBy(source2, keySelector, comparer));
+
+    /// <inheritdoc />
+    public IDataStoreWhereQueryable<TSource> Where(Expression<Func<TSource, bool>> predicate)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Where(predicate));
+
+    /// <inheritdoc />
+    public IDataStoreWhereQueryable<TSource> Where(Expression<Func<TSource, int, bool>> predicate)
+        => new EntityFrameworkDataStoreQueryable<TSource>(Provider, source.Where(predicate));
+
+    /// <inheritdoc />
+    public IDataStoreZipQueryable<TResult> Zip<TSecond, TResult>(
+        IEnumerable<TSecond> source2,
+        Expression<Func<TSource, TSecond, TResult>> resultSelector) where TResult : notnull
+        => new EntityFrameworkDataStoreQueryable<TResult>(Provider, source.Zip(source2, resultSelector));
+
+    /// <inheritdoc />
+    public IDataStoreZipQueryable<(TSource First, TSecond Second)> Zip<TSecond>(IEnumerable<TSecond> source2)
+        => new EntityFrameworkDataStoreQueryable<(TSource First, TSecond Second)>(Provider, source.Zip(source2));
+
+    /// <inheritdoc />
+    public IDataStoreZipQueryable<(TSource First, TSecond Second, TThird Third)> Zip<TSecond, TThird>(IEnumerable<TSecond> source2, IEnumerable<TThird> source3)
+        => new EntityFrameworkDataStoreQueryable<(TSource First, TSecond Second, TThird Third)>(Provider, source.Zip(source2, source3));
 }
