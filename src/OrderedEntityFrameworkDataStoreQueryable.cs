@@ -6,6 +6,9 @@ namespace Tavenem.DataStorage.EntityFramework;
 /// <summary>
 /// Provides LINQ operations on an <see cref="EntityFrameworkDataStore"/>, after an ordering operation.
 /// </summary>
+/// <typeparam name="TSource">
+/// The type of the elements of the source.
+/// </typeparam>
 public class OrderedEntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IOrderedQueryable<TSource> source)
     : EntityFrameworkDataStoreQueryable<TSource>(provider, source),
     IOrderedDataStoreQueryable<TSource>

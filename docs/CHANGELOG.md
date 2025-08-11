@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.35.0-preview
+## 0.35.1-preview
 ### Changed
 - Update to .NET 10
 - The original `EntityFrameworkDataStore` has been divided into three separate implementations:

@@ -50,7 +50,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// <see langword="true"/> if all the elements of a sequence satisfy a condition; otherwise,
     /// <see langword="false"/>.
     /// </returns>
-    public async ValueTask<bool> AllAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+    public async ValueTask<bool> AllAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
         => await source.AllAsync(predicate, cancellationToken);
 
     /// <summary>
@@ -61,7 +61,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// <see langword="true"/> if the source sequence contains any elements; otherwise, <see
     /// langword="false"/>.
     /// </returns>
-    public async ValueTask<bool> AnyAsync(CancellationToken cancellationToken)
+    public async ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default)
         => await source.AnyAsync(cancellationToken);
 
     /// <summary>
@@ -73,7 +73,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// <see langword="true"/>> if the source sequence is not empty and at least one of its elements
     /// passes the test in the specified predicate; otherwise, <see langword="false"/>.
     /// </returns>
-    public async ValueTask<bool> AnyAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+    public async ValueTask<bool> AnyAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
         => await source.AnyAsync(predicate, cancellationToken);
 
     /// <summary>
@@ -99,7 +99,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// <exception cref="OverflowException">
     /// The number of elements in this source is larger than <see cref="int.MaxValue"/>.
     /// </exception>
-    public async ValueTask<int> CountAsync(CancellationToken cancellationToken)
+    public async ValueTask<int> CountAsync(CancellationToken cancellationToken = default)
         => await source.CountAsync(cancellationToken);
 
     /// <summary>
@@ -112,7 +112,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// The number of elements in this source that satisfy the condition is larger than <see
     /// cref="int.MaxValue"/>.
     /// </exception>
-    public async ValueTask<int> CountAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+    public async ValueTask<int> CountAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
         => await source.CountAsync(predicate, cancellationToken);
 
     /// <inheritdoc />
@@ -357,7 +357,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// <exception cref="OverflowException">
     /// The number of elements in this source is larger than <see cref="long.MaxValue"/>.
     /// </exception>
-    public async ValueTask<long> LongCountAsync(CancellationToken cancellationToken)
+    public async ValueTask<long> LongCountAsync(CancellationToken cancellationToken = default)
         => await source.LongCountAsync(cancellationToken);
 
     /// <summary>
@@ -370,7 +370,7 @@ public class EntityFrameworkDataStoreQueryable<TSource>(IDataStore provider, IQu
     /// The number of elements in this source that satisfy the condition is larger than <see
     /// cref="long.MaxValue"/>.
     /// </exception>
-    public async ValueTask<long> LongCountAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken)
+    public async ValueTask<long> LongCountAsync(Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
         => await source.LongCountAsync(predicate, cancellationToken);
 
     /// <summary>
